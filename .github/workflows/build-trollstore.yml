@@ -57,7 +57,7 @@ jobs:
           bash build-ipa.sh Release
           python3 scripts/verify-ipa.py build/AirCard-iOS.ipa
           mv build/AirCard-iOS.ipa build/AirCard-iOS17-TrollStore.ipa
-          shasum -a 256 build/AirCard-iOS17-TrollStore.ipa > build/SHA256SUMS.txt
+          (cd build && shasum -a 256 AirCard-iOS17-TrollStore.ipa > SHA256SUMS.txt)
       - uses: actions/upload-artifact@v4
         with:
           name: AirCard-iOS17-TrollStore
