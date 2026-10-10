@@ -1,0 +1,68 @@
+name: Build iOS 17 TrollStore IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [trollstore-ios17]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+      IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+      RUSTFLAGS: "--remap-path-prefix=/Users/runner=/build"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tools
+        run: |
+          brew install xcodegen
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+          rustup target add aarch64-apple-ios
+          xcodebuild -version
+      - uses: actions/cache/restore@v4
+        id: rust-cache
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            rust-core/target
+          key: rust-ios17-${{ runner.os }}-xcode16.4-${{ hashFiles('rust-core/Cargo.lock', 'rust-core/Cargo.toml', 'rust-core/src/**', 'rust-core/vendor/**') }}
+      - name: Check direct file access and rebuild Rust for iOS 17
+        run: |
+          rustc --edition 2021 --test tests/trollstore_fs.rs -o /tmp/trollstore-fs-tests
+          /tmp/trollstore-fs-tests
+          cargo build --manifest-path rust-core/Cargo.toml --locked --release --features trollstore --target aarch64-apple-ios
+          rm -rf AirliftFFI.xcframework
+          xcodebuild -create-xcframework \
+            -library rust-core/target/aarch64-apple-ios/release/libairlift_ffi.a \
+            -headers rust-core/include \
+            -output AirliftFFI.xcframework
+      - uses: actions/cache/save@v4
+        if: steps.rust-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            rust-core/target
+          key: ${{ steps.rust-cache.outputs.cache-primary-key }}
+      - name: Build and package TrollStore IPA
+        run: |
+          xcodegen generate
+          bash build-ipa.sh Release
+          python3 scripts/verify-ipa.py build/AirCard-iOS.ipa
+          mv build/AirCard-iOS.ipa build/AirCard-iOS17-TrollStore.ipa
+          shasum -a 256 build/AirCard-iOS17-TrollStore.ipa > build/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AirCard-iOS17-TrollStore
+          path: |
+            build/AirCard-iOS17-TrollStore.ipa
+            build/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 30

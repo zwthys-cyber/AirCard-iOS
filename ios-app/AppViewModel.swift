@@ -92,7 +92,7 @@ final class AppViewModel: ObservableObject {
         return .en
     }
 
-    @Published var targetTelephonyVersion: String = "TelephonyUI-10"
+    @Published var targetTelephonyVersion: String = ProcessInfo.processInfo.operatingSystemVersion.majorVersion <= 17 ? "TelephonyUI-9" : "TelephonyUI-10"
     @Published var passcodeLanguageTarget: PasscodeLanguageTarget = AppViewModel.detectedDeviceLanguage
     @Published var passcodeBoldTarget: PasscodeBoldTarget = .both
     @Published var showSuccessAlert: Bool = false
@@ -390,6 +390,10 @@ final class AppViewModel: ObservableObject {
 
     func startCardScanning() {
         guard !isScanningCards else { return }
+        if TrollStoreAccess.enabled {
+            scanCardsDirectly()
+            return
+        }
         guard hasPairingFile else {
             errorMessage = "Pairing file is required before scanning. Pair this iPhone or select a .plist first."
             return
@@ -458,6 +462,32 @@ final class AppViewModel: ObservableObject {
         thread.stackSize = 4 * 1024 * 1024 // 4 MB stack
         thread.qualityOfService = .userInitiated
         thread.start()
+    }
+
+    private func scanCardsDirectly() {
+        let directory = URL(fileURLWithPath: "/var/mobile/Library/Passes/Cards", isDirectory: true)
+        do {
+            let entries = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+            var found = Set<String>()
+            for entry in entries where entry.pathExtension == "pkpass" {
+                guard let id = CardItem.cleanCardId(entry.deletingPathExtension().lastPathComponent) else { continue }
+                found.insert(id)
+                registerDiscoveredCard(id: id)
+                if let data = try? Data(contentsOf: entry.appendingPathComponent("pass.json")),
+                   let pass = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let name = pass["description"] as? String,
+                   let index = cards.firstIndex(where: { $0.id == id }),
+                   cards[index].displayName == nil {
+                    cards[index].displayName = name
+                }
+            }
+            saveCards()
+            scanStatusText = "TrollStore: found \(found.count) card(s)."
+            log.append(scanStatusText)
+        } catch {
+            scanStatusText = "Card scan failed: \(error.localizedDescription)"
+            errorMessage = "Wallet files could not be read. Install this IPA through TrollStore and unlock your iPhone.\n\(error.localizedDescription)"
+        }
     }
 
     func stopCardScanning() {
@@ -721,7 +751,7 @@ final class AppViewModel: ObservableObject {
     // MARK: - Card Flash (via Airlift exploit)
 
     var canFlashCards: Bool {
-        hasPairingFile &&
+        (TrollStoreAccess.enabled || hasPairingFile) &&
         cardFlashPhase != .running &&
         cards.contains { $0.isSelected && ($0.customImage != nil || $0.customImageData != nil) }
     }
@@ -738,7 +768,7 @@ final class AppViewModel: ObservableObject {
         cardFlashLog.removeAll()
         errorMessage = nil
 
-        if !vpnUp {
+        if !TrollStoreAccess.enabled && !vpnUp {
             cardFlashLog.append("⚠️ Notice: Loopback VPN (LocalDevVPN or SideStore WireGuard) is strongly recommended for on-device operations.")
         }
 
@@ -981,7 +1011,7 @@ final class AppViewModel: ObservableObject {
     // MARK: - Passthm Flash
 
     var canFlashPassthm: Bool {
-        guard hasPairingFile && passthmFlashPhase != .running else { return false }
+        guard (TrollStoreAccess.enabled || hasPairingFile) && passthmFlashPhase != .running else { return false }
         switch passcodeMode {
         case .applyTheme:
             return loadedTheme != nil && !(loadedTheme?.keysPreview.isEmpty ?? true)
@@ -1018,7 +1048,7 @@ final class AppViewModel: ObservableObject {
         errorMessage = nil
         syncTargetHostsToRust()
 
-        if !vpnUp {
+        if !TrollStoreAccess.enabled && !vpnUp {
             passthmFlashLog.append("⚠️ Notice: Loopback VPN (LocalDevVPN or SideStore WireGuard) is strongly recommended for on-device operations.")
         }
 
@@ -1282,7 +1312,7 @@ final class AppViewModel: ObservableObject {
 
     func autoDetectPosterBoardContainer(silent: Bool = false) async {
         let pairingPath = PairingController.pairingFilePath()
-        guard FileManager.default.fileExists(atPath: pairingPath) else {
+        guard TrollStoreAccess.enabled || FileManager.default.fileExists(atPath: pairingPath) else {
             if !silent {
                 await MainActor.run {
                     self.errorMessage = "No pairing file active. Pair your device first in the Pairing tab."
@@ -1319,7 +1349,7 @@ final class AppViewModel: ObservableObject {
         }
 
         let pairingPath = PairingController.pairingFilePath()
-        guard FileManager.default.fileExists(atPath: pairingPath) else {
+        guard TrollStoreAccess.enabled || FileManager.default.fileExists(atPath: pairingPath) else {
             errorMessage = "No pairing file active. Please pair your device first."
             return
         }

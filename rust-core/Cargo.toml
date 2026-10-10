@@ -8,6 +8,9 @@ description = "C FFI shim for the iOS airlift exploit — RPPairing host + AirTr
 name = "airlift_ffi"
 crate-type = ["staticlib"]
 
+[features]
+trollstore = []
+
 [dependencies]
 # idevice: RPPairing host, loopback RSD tunnel, streaming_zip_conduit, AFC.
 # Pinned to the same revision as SideInstaller for a known-good implementation.

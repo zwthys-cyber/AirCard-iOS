@@ -4,8 +4,8 @@
 # Run any time rust-core/ changes, then regenerate with `xcodegen generate`.
 set -euo pipefail
 
-export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode-beta.app/Contents/Developer}"
-export IPHONEOS_DEPLOYMENT_TARGET="${IPHONEOS_DEPLOYMENT_TARGET:-18.0}"
+export DEVELOPER_DIR="${DEVELOPER_DIR:-$(xcode-select -p)}"
+export IPHONEOS_DEPLOYMENT_TARGET="${IPHONEOS_DEPLOYMENT_TARGET:-17.0}"
 
 # Make ~/.cargo visible to non-login shells (Xcode build phases, CI)
 # shellcheck disable=SC1090
@@ -23,8 +23,8 @@ echo "==> Installing iOS targets (if needed)"
 rustup target add aarch64-apple-ios aarch64-apple-ios-sim 2>/dev/null || true
 
 echo "==> Building Rust static libs (release)"
-cargo build --release --target aarch64-apple-ios
-cargo build --release --target aarch64-apple-ios-sim
+cargo build --locked --release --features trollstore --target aarch64-apple-ios
+cargo build --locked --release --features trollstore --target aarch64-apple-ios-sim
 
 cd "$ROOT"
 echo "==> Repackaging AirliftFFI.xcframework"

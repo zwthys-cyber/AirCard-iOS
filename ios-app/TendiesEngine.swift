@@ -187,6 +187,9 @@ public final class TendiesEngine {
     // MARK: - Auto-detect PosterBoard Container
 
     public func detectPosterBoardContainer(pairingPath: String) async throws -> String {
+        if TrollStoreAccess.enabled {
+            return try TrollStoreAccess.posterBoardContainer()
+        }
         return try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.global(qos: .userInitiated).async {
                 var outContainer: UnsafeMutablePointer<CChar>? = nil

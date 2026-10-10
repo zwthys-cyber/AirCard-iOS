@@ -14,6 +14,47 @@ pub mod ffi_util;
 pub mod grappa;
 pub mod logging;
 pub mod pairing;
+mod trollstore_fs;
+
+unsafe fn trollstore_write(
+    pairing_path: *const c_char,
+    source_dir: *const c_char,
+    target_dir: *const c_char,
+    dest_name: Option<*const c_char>,
+    log_cb: exploit::ALLogCallback,
+    ctx: *mut c_void,
+    out_error: *mut *mut c_char,
+) -> i32 {
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> Result<(), String> {
+        let string = |pointer: *const c_char| -> Result<String, String> {
+            if pointer.is_null() { return Err("Missing file path".into()); }
+            std::ffi::CStr::from_ptr(pointer).to_str().map(str::to_owned).map_err(|e| e.to_string())
+        };
+        let pairing = string(pairing_path)?;
+        let source = string(source_dir)?;
+        let target = string(target_dir)?;
+        let documents = std::path::Path::new(&pairing).parent().ok_or("Missing Documents directory")?;
+        let backups = documents.join("TrollStoreBackups");
+        if let Some(callback) = log_cb {
+            let line = std::ffi::CString::new(format!("TrollStore: direct write to {target}; originals backed up in Documents/TrollStoreBackups")).map_err(|e| e.to_string())?;
+            callback(ctx, line.as_ptr());
+        }
+        let source = std::path::Path::new(&source);
+        let target = std::path::Path::new(&target);
+        if let Some(name) = dest_name {
+            trollstore_fs::inject_folder(source, target, &string(name)?, &backups)
+        } else {
+            trollstore_fs::write_directory(source, target, &backups)
+        }.map_err(|e| format!("TrollStore file access failed: {e}"))
+    }));
+    let error = match result {
+        Ok(Ok(())) => return 0,
+        Ok(Err(error)) => error,
+        Err(_) => "TrollStore file operation panicked".into(),
+    };
+    if !out_error.is_null() { *out_error = ffi_util::cstr(error); }
+    1
+}
 
 // Re-export idevice-ffi's symbols into our staticlib (tunnel_create_rppairing,
 // afc_*, rsd_*, adapter_*, etc.) so Swift can call them directly.
@@ -126,6 +167,9 @@ pub unsafe extern "C" fn al_exploit_write_dir(
     ctx: *mut c_void,
     out_error: *mut *mut c_char,
 ) -> i32 {
+    if cfg!(feature = "trollstore") {
+        return trollstore_write(pairing_path, source_dir, target_dir, None, log_cb, ctx, out_error);
+    }
     let res = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         exploit::write_dir(pairing_path, source_dir, target_dir, log_cb, ctx, out_error)
     }));
@@ -154,6 +198,9 @@ pub unsafe extern "C" fn al_exploit_inject_folder(
     ctx: *mut c_void,
     out_error: *mut *mut c_char,
 ) -> i32 {
+    if cfg!(feature = "trollstore") {
+        return trollstore_write(pairing_path, folder_path, target_parent_dir, Some(dest_name), log_cb, ctx, out_error);
+    }
     let res = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
         exploit::inject_folder(pairing_path, folder_path, target_parent_dir, dest_name, log_cb, ctx, out_error)
     }));

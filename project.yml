@@ -2,12 +2,13 @@ name: AirCard-iOS
 options:
   bundleIdPrefix: com.mak5er
   deploymentTarget:
-    iOS: "18.0"
+    iOS: "17.0"
   createIntermediateGroups: true
 
 settings:
   base:
     SWIFT_VERSION: "5.0"
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) TROLLSTORE"
     MARKETING_VERSION: "1.3.2"
     CURRENT_PROJECT_VERSION: "1.3.2"
     TARGETED_DEVICE_FAMILY: "1"
@@ -39,6 +40,8 @@ targets:
     platform: iOS
     sources:
       - path: tests
+        excludes:
+          - trollstore_fs.rs
     dependencies:
       - target: AirCard-iOS
     settings:

@@ -31,6 +31,10 @@ cp -R "$APP_PATH" build/AirCard-iOS.app
 rm -rf build/AirCard-iOS.app/_CodeSignature
 rm -rf build/AirCard-iOS.app/embedded.mobileprovision
 
+# TrollStore preserves these entitlements when installing the IPA.
+codesign --force --sign - --entitlements ios-app/TrollStore.entitlements build/AirCard-iOS.app
+codesign --verify --strict build/AirCard-iOS.app
+
 mkdir -p build/Payload
 cp -R build/AirCard-iOS.app build/Payload/AirCard-iOS.app
 

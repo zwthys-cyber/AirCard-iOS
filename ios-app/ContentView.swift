@@ -346,7 +346,7 @@ struct CreditsSheet: View {
                 Text("AirCard-iOS")
                     .font(.title2.bold())
 
-                Text("Apple Wallet Skins & Passcode Themes (iOS 18.0 – 27.2 b2)")
+                Text("Apple Wallet Skins & Passcode Themes · iOS 17.0 TrollStore build")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -909,6 +909,16 @@ struct PairingTab: View {
     }
 
     var body: some View {
+        Group {
+            if TrollStoreAccess.enabled {
+                TrollStoreSetupView()
+            } else {
+                pairingBody
+            }
+        }
+    }
+
+    private var pairingBody: some View {
         NavigationStack {
             Form {
                 // Header
