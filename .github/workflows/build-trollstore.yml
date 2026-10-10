@@ -1,4 +1,4 @@
-name: Build iOS 17 TrollStore IPA
+name: Build iOS 17 TrollStore Chinese IPA
 
 on:
   workflow_dispatch:
@@ -56,13 +56,13 @@ jobs:
           xcodegen generate
           bash build-ipa.sh Release
           python3 scripts/verify-ipa.py build/AirCard-iOS.ipa
-          mv build/AirCard-iOS.ipa build/AirCard-iOS17-TrollStore.ipa
-          (cd build && shasum -a 256 AirCard-iOS17-TrollStore.ipa > SHA256SUMS.txt)
+          mv build/AirCard-iOS.ipa build/AirCard-iOS17-TrollStore-zhCN.ipa
+          (cd build && shasum -a 256 AirCard-iOS17-TrollStore-zhCN.ipa > SHA256SUMS.txt)
       - uses: actions/upload-artifact@v4
         with:
-          name: AirCard-iOS17-TrollStore
+          name: AirCard-iOS17-TrollStore-zhCN
           path: |
-            build/AirCard-iOS17-TrollStore.ipa
+            build/AirCard-iOS17-TrollStore-zhCN.ipa
             build/SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 30

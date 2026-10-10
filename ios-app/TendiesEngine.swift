@@ -51,7 +51,7 @@ public final class TendiesEngine {
             throw NSError(
                 domain: "TendiesEngine",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Failed to store wallpaper file at \(destinationURL.path)"]
+                userInfo: [NSLocalizedDescriptionKey: "无法将壁纸保存到 \(destinationURL.path)"]
             )
         }
 
@@ -73,7 +73,7 @@ public final class TendiesEngine {
             throw NSError(
                 domain: "TendiesEngine",
                 code: Int(extractRC),
-                userInfo: [NSLocalizedDescriptionKey: "Failed to extract .tendies zip archive (code \(extractRC))"]
+                userInfo: [NSLocalizedDescriptionKey: "解压 .tendies 壁纸失败（错误码 \(extractRC)）"]
             )
         }
 
@@ -210,7 +210,7 @@ public final class TendiesEngine {
                         let s = String(cString: p)
                         al_string_free(p)
                         return s
-                    } ?? "Failed to find PosterBoard container"
+                    } ?? "未找到 PosterBoard 容器"
                     continuation.resume(throwing: NSError(
                         domain: "TendiesEngine",
                         code: Int(rc),
@@ -249,7 +249,7 @@ public final class TendiesEngine {
         progress: @escaping (Double) -> Void
     ) async throws {
         guard !items.isEmpty else {
-            log("⚠️ No wallpapers selected to flash")
+            log("⚠️ 尚未选择要应用的壁纸")
             return
         }
 
@@ -261,20 +261,20 @@ public final class TendiesEngine {
             throw NSError(
                 domain: "TendiesEngine",
                 code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "PosterBoard Container path is required."]
+                userInfo: [NSLocalizedDescriptionKey: "请提供 PosterBoard 容器路径。"]
             )
         }
 
         let majorVer = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
         let structVersion = (majorVer <= 16) ? 59 : 61
 
-        log("🚀 Starting PosterBoard injection into \(normalizedContainer)")
-        log("ℹ️ Target PosterBoard structure version: \(structVersion) (iOS \(majorVer))")
+        log("🚀 正在向 \(normalizedContainer) 写入壁纸")
+        log("ℹ️ 目标 PosterBoard 结构版本：\(structVersion)（iOS \(majorVer)）")
 
         let totalItems = Double(items.count)
 
         for (itemIndex, item) in items.enumerated() {
-            log("\n📦 [\(itemIndex + 1)/\(items.count)] Processing '\(item.name)'…")
+            log("\n📦 [\(itemIndex + 1)/\(items.count)] 正在处理“\(item.name)”…")
 
             let tempStageDir = FileManager.default.temporaryDirectory
                 .appendingPathComponent("tendie_flash_\(UUID().uuidString)")
@@ -289,18 +289,18 @@ public final class TendiesEngine {
                 }
             }
             guard extractRC == 0 else {
-                log("❌ Failed to extract '\(item.name)'")
+                log("❌ 解压“\(item.name)”失败")
                 continue
             }
 
-            log("  🖼 Locating wallpaper descriptors…")
+            log("  🖼 正在查找壁纸描述项…")
             let descriptors = findDescriptorsWithExtensions(in: tempStageDir, defaultExt: item.posterType.extensionBundleId)
-            log("  ✨ Found \(descriptors.count) descriptor(s) to install")
+            log("  ✨ 找到 \(descriptors.count) 个待安装描述项")
 
             for (descIndex, descItem) in descriptors.enumerated() {
                 let targetUUID = UUID().uuidString.uppercased()
                 let randomizedID = Int.random(in: 10000...99999)
-                log("  [\(descIndex + 1)/\(descriptors.count)] Descriptor \(targetUUID) for \(descItem.ext)…")
+                log("  [\(descIndex + 1)/\(descriptors.count)] 正在处理 \(descItem.ext) 的描述项 \(targetUUID)…")
 
                 // Update plist identifiers for templates/videos without suggestionMetadata
                 updatePlistIdentifiers(in: descItem.url, randomizedID: randomizedID)
@@ -339,7 +339,7 @@ public final class TendiesEngine {
         }
 
         // Always force PosterBoard cache refresh and file protections reset
-        log("\n🔄 Forcing PosterBoard cache refresh and file protections reset…")
+        log("\n🔄 正在强制刷新壁纸缓存并重置文件保护…")
         let stagePrefDir = FileManager.default.temporaryDirectory
             .appendingPathComponent("tendie_pref_\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: stagePrefDir, withIntermediateDirectories: true)
@@ -386,10 +386,10 @@ public final class TendiesEngine {
             pairingPath: pairingPath,
             log: log
         )
-        log("✅ PosterBoard preferences staged for reload")
+        log("✅ 壁纸偏好设置已就绪，等待重载")
 
         progress(1.0)
-        log("\n🎉 All wallpapers injected successfully! Open Lock Screen settings or long-press lockscreen to choose your new wallpaper.")
+        log("\n🎉 所有壁纸已写入！请打开锁屏设置或长按锁屏，选择新壁纸。")
     }
 
     // MARK: - Tree Writer Helper
@@ -442,7 +442,7 @@ public final class TendiesEngine {
                 targetDir = "\(targetBaseDir)/\(relPath)"
             }
 
-            log("  Writing to \(targetDir)…")
+            log("  正在写入 \(targetDir)…")
 
             var writeOk = false
             var errDesc: String? = nil
@@ -476,7 +476,7 @@ public final class TendiesEngine {
                 throw NSError(
                     domain: "TendiesEngine",
                     code: 1,
-                    userInfo: [NSLocalizedDescriptionKey: "Failed to write directory: \(errDesc ?? "exploit error")"]
+                    userInfo: [NSLocalizedDescriptionKey: "写入目录失败：\(errDesc ?? "操作失败")"]
                 )
             }
         }
@@ -542,7 +542,7 @@ public final class TendiesEngine {
         pairingPath: String,
         log: @escaping (String) -> Void
     ) async throws {
-        log("  📦 Injecting '\(destName)' into \(targetParentDir)…")
+        log("  📦 正在将“\(destName)”写入 \(targetParentDir)…")
         var errDesc: String? = nil
         let ok: Bool = await withCheckedContinuation { cont in
             DispatchQueue.global(qos: .userInitiated).async {
@@ -582,7 +582,7 @@ public final class TendiesEngine {
             throw NSError(
                 domain: "TendiesEngine",
                 code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "Failed to inject descriptor: \(errDesc ?? "exploit error")"]
+                userInfo: [NSLocalizedDescriptionKey: "写入描述项失败：\(errDesc ?? "操作失败")"]
             )
         }
     }

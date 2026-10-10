@@ -122,11 +122,11 @@ struct CardPhotoPicker: UIViewControllerRepresentable {
             let spinner = UIActivityIndicatorView(style: .large)
             spinner.startAnimating()
             let label = UILabel()
-            label.text = "Loading Photo…"
+            label.text = "正在载入图片…"
             label.font = .preferredFont(forTextStyle: .body)
             label.adjustsFontForContentSizeCategory = true
             let cancel = UIButton(type: .system)
-            cancel.setTitle("Cancel", for: .normal)
+            cancel.setTitle("取消", for: .normal)
             cancel.addAction(UIAction { [weak self] _ in self?.cancelLoading() }, for: .touchUpInside)
             let stack = UIStackView(arrangedSubviews: [spinner, label, cancel])
             stack.axis = .vertical

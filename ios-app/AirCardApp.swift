@@ -24,6 +24,7 @@ struct AirCardApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(vm)
+                .environment(\.locale, Locale(identifier: "zh-Hans"))
         }
     }
 }

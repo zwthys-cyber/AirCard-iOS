@@ -28,43 +28,43 @@ struct CardPhotoCropView: View {
                         }
                         .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                         .accessibilityElement(children: .ignore)
-                        .accessibilityLabel("Photo crop")
-                        .accessibilityHint("Move the photo to choose the part shown on your card. Use the Zoom slider to resize it.")
-                        .accessibilityAction(named: Text("Move photo left")) { editor.pan(x: 0.1, y: 0) }
-                        .accessibilityAction(named: Text("Move photo right")) { editor.pan(x: -0.1, y: 0) }
-                        .accessibilityAction(named: Text("Move photo up")) { editor.pan(x: 0, y: 0.1) }
-                        .accessibilityAction(named: Text("Move photo down")) { editor.pan(x: 0, y: -0.1) }
+                        .accessibilityLabel("图片裁剪")
+                        .accessibilityHint("移动图片以选择卡面显示的区域，使用缩放滑块调整大小。")
+                        .accessibilityAction(named: Text("向左移动图片")) { editor.pan(x: 0.1, y: 0) }
+                        .accessibilityAction(named: Text("向右移动图片")) { editor.pan(x: -0.1, y: 0) }
+                        .accessibilityAction(named: Text("向上移动图片")) { editor.pan(x: 0, y: 0.1) }
+                        .accessibilityAction(named: Text("向下移动图片")) { editor.pan(x: 0, y: -0.1) }
                 }
 
-                Text("Drag to position. Pinch to zoom.")
+                Text("拖动调整位置，双指捏合缩放。")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
 
                 HStack(spacing: 12) {
                     Slider(value: Binding(get: { editor.zoom }, set: { editor.setZoom($0) }), in: 1...5) {
-                        Text("Zoom")
+                        Text("缩放")
                     }
-                    .accessibilityValue("\(Int((editor.zoom * 100).rounded())) percent")
+                    .accessibilityValue("百分之 \(Int((editor.zoom * 100).rounded()))")
 
                     Text("\(editor.zoom, specifier: "%.1f")×")
                         .font(.subheadline.monospacedDigit())
                         .fixedSize()
 
-                    Button("Reset") { editor.reset() }
+                    Button("重置") { editor.reset() }
                         .fixedSize()
                 }
             }
             .padding()
             .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle("Adjust Photo")
+            .navigationTitle("调整图片")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Back") { dismiss() }
+                    Button("返回") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Use Photo") {
+                    Button("使用此图片") {
                         guard let cropped = editor.canvas?.croppedImage() else { return }
                         onUse(cropped)
                         dismiss()

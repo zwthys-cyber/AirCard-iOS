@@ -75,13 +75,13 @@ final class WalletScanParserTests: XCTestCase {
 
     func testCardItemDisplayTitle() {
         var card = CardItem(id: "CARD_TEST_HASH_1234567890123=", displayName: nil, paymentNetwork: "Visa")
-        XCTAssertEqual(card.title, "Visa Card")
+        XCTAssertEqual(card.title, "Visa卡")
 
         card.displayName = "Monobank Black"
         XCTAssertEqual(card.title, "Monobank Black")
 
         let unknownCard = CardItem(id: "CARD_TEST_HASH_1234567890123=", displayName: nil, paymentNetwork: nil)
-        XCTAssertEqual(unknownCard.title, "Payment Card")
+        XCTAssertEqual(unknownCard.title, "支付卡片")
     }
 
     func testTargetHostConfigurationFFI() {

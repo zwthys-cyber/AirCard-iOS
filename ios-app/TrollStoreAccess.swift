@@ -24,7 +24,7 @@ enum TrollStoreAccess {
                 return container.path
             }
         }
-        throw NSError(domain: "TrollStoreAccess", code: 1, userInfo: [NSLocalizedDescriptionKey: "PosterBoard container could not be read. Install this build through TrollStore and unlock your iPhone."])
+        throw NSError(domain: "TrollStoreAccess", code: 1, userInfo: [NSLocalizedDescriptionKey: "无法读取 PosterBoard 容器。请通过巨魔安装此版本，并解锁 iPhone。"])
     }
 }
 
@@ -35,24 +35,24 @@ struct TrollStoreSetupView: View {
         NavigationStack {
             Form {
                 Section {
-                    Label("AirCard · TrollStore", systemImage: "creditcard.circle.fill")
+                    Label("AirCard · 巨魔汉化版", systemImage: "creditcard.circle.fill")
                         .font(.title2.bold())
-                    Text("iOS 17.0 build · v1.3.2").foregroundStyle(.secondary)
-                    Text("Wallet skins and passcode themes use direct file access. Pairing files and LocalDevVPN are not required.")
+                    Text("iOS 17.0 汉化版 · v1.3.2").foregroundStyle(.secondary)
+                    Text("钱包卡面和密码主题通过直接访问文件应用，无需配对文件或 LocalDevVPN。")
                 }
-                Section("Get started") {
-                    Text("Install this IPA with TrollStore, then scan your cards in Wallet or create a passcode theme.")
-                    Text("The passcode cache defaults to TelephonyUI-9 on iOS 17.")
+                Section("开始使用") {
+                    Text("使用巨魔安装此 IPA，然后在“钱包卡片”中扫描卡片，或创建密码主题。")
+                    Text("iOS 17 的密码键盘缓存默认使用 TelephonyUI-9。")
                 }
-                Section("Compatibility") {
-                    Text("This is an experimental port. Applying Wallet, passcode, and wallpaper changes still needs testing on your device.")
+                Section("兼容性") {
+                    Text("这是实验适配版本，钱包卡面、密码主题和壁纸功能仍需在你的设备上测试。")
                 }
-                Section("Original files") {
-                    Text("Files replaced by this build are backed up in AirCard-iOS › TrollStoreBackups in the Files app.")
+                Section("原文件备份") {
+                    Text("本版本覆盖的原文件会备份到“文件”App 中的 AirCard-iOS › TrollStoreBackups 目录。")
                 }
             }
-            .navigationTitle("Access")
-            .toolbar { Button("Credits") { showCredits = true } }
+            .navigationTitle("访问权限")
+            .toolbar { Button("关于与致谢") { showCredits = true } }
             .sheet(isPresented: $showCredits) { CreditsSheet() }
         }
     }

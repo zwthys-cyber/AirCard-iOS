@@ -1,11 +1,14 @@
 # AirCard for iOS 17.0 / TrollStore
 
+当前版本为简体中文汉化版，覆盖钱包、密码主题、壁纸、图片裁剪、设置选项、
+权限说明及常见提示。下载文件名为 `AirCard-iOS17-TrollStore-zhCN.ipa`。
+
 This fork is an experimental TrollStore port of Mak5er/AirCard-iOS, based on
 upstream commit `40640c4d827aeab8d798285b57d24fcf6be070d0` (v1.3.2).
 
 ## 安装
 
-1. 下载 `AirCard-iOS17-TrollStore.ipa`，用已安装的 TrollStore 打开并安装。
+1. 下载 `AirCard-iOS17-TrollStore-zhCN.ipa`，用已安装的 TrollStore 打开并安装。
 2. 在 Wallet 页面扫描卡片，再选择图片；密码主题默认使用 iOS 17 的
    `TelephonyUI-9` 缓存。
 3. 本版本直接访问文件，不需要配对文件或 LocalDevVPN。

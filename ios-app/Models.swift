@@ -42,9 +42,10 @@ struct CardItem: Identifiable, Equatable {
             return name
         }
         if let net = paymentNetwork, !net.isEmpty {
-            return net.hasSuffix("Card") ? net : "\(net) Card"
+            let brand = net.hasSuffix("Card") ? String(net.dropLast(4)).trimmingCharacters(in: .whitespaces) : net
+            return "\(ChineseTitles.title(brand))卡"
         }
-        return "Payment Card"
+        return "支付卡片"
     }
 
     /// Normalizes and cleans a card identifier, stripping paths, extensions (.pkpass, .cache),

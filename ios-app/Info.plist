@@ -3,9 +3,13 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
+	<string>zh-Hans</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>zh-Hans</string>
+	</array>
 	<key>CFBundleDisplayName</key>
-	<string>AirCard-iOS</string>
+	<string>AirCard 汉化版</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -35,9 +39,9 @@
 		<string>_aircardprobe._tcp</string>
 	</array>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>AirCard-iOS advertises an on-device pairing service so this iPhone can pair with itself, and connects to the local lockdown daemon to run the exploit.</string>
+	<string>AirCard 使用本地网络提供设备配对服务，并连接设备内部服务。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>AirCard-iOS needs photo access to apply custom card skins and passcode themes.</string>
+	<string>AirCard 需要访问照片，以设置自定义钱包卡面和密码主题。</string>
 	<!-- Background: audio keeps the app alive while the user approves the PIN -->
 	<key>UIBackgroundModes</key>
 	<array>
@@ -59,7 +63,7 @@
 	<array>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Passcode Theme</string>
+			<string>密码主题</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSHandlerRank</key>
@@ -71,7 +75,7 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Pairing File</string>
+			<string>配对文件</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSHandlerRank</key>
@@ -83,7 +87,7 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>PosterBoard Wallpaper</string>
+			<string>PosterBoard 壁纸</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSHandlerRank</key>
@@ -100,7 +104,7 @@
 			<key>UTTypeIdentifier</key>
 			<string>com.aircard.passthm</string>
 			<key>UTTypeDescription</key>
-			<string>Passcode Theme Archive</string>
+			<string>密码主题归档</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.data</string>
@@ -118,7 +122,7 @@
 			<key>UTTypeIdentifier</key>
 			<string>com.aircard.tendies</string>
 			<key>UTTypeDescription</key>
-			<string>PosterBoard Wallpaper Archive</string>
+			<string>PosterBoard 壁纸归档</string>
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.data</string>

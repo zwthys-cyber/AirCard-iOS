@@ -17,6 +17,9 @@ with tempfile.TemporaryDirectory() as temporary:
     application = applications[0]
     info = plistlib.loads((application / "Info.plist").read_bytes())
     assert info["MinimumOSVersion"] == "17.0", info["MinimumOSVersion"]
+    assert info["CFBundleDevelopmentRegion"] == "zh-Hans", "Expected Simplified Chinese"
+    assert "zh-Hans" in info["CFBundleLocalizations"], "Missing Chinese app localization"
+    assert info["CFBundleDisplayName"] == "AirCard 汉化版", "Expected Chinese app name"
     binary = application / info["CFBundleExecutable"]
     data = binary.read_bytes()
     header = struct.unpack_from("<8I", data)
@@ -36,4 +39,4 @@ with tempfile.TemporaryDirectory() as temporary:
     entitlements = plistlib.loads(signature.stdout)
     for key in ("platform-application", "com.apple.private.security.no-sandbox", "com.apple.private.security.storage.AppDataContainers"):
         assert entitlements.get(key) is True, f"Missing entitlement: {key}"
-    print(f"Verified: {info['CFBundleIdentifier']}, arm64, iOS 17.0, signed with TrollStore entitlements")
+    print(f"Verified: {info['CFBundleIdentifier']}, arm64, iOS 17.0, zh-Hans, signed with TrollStore entitlements")
