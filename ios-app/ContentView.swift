@@ -840,7 +840,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $vm.selectedTab) {
             PairingTab()
-                .tabItem { Label("Pairing", systemImage: "antenna.radiowaves.left.and.right") }
+                .tabItem { Label(TrollStoreAccess.enabled ? "Access" : "Pairing", systemImage: TrollStoreAccess.enabled ? "checkmark.shield" : "antenna.radiowaves.left.and.right") }
                 .tag(AppTab.pairing)
 
             WalletCardsTab()
@@ -1900,7 +1900,9 @@ struct WalletCardsTab: View {
                     Text("2.")
                         .bold()
                         .foregroundStyle(.blue)
-                    Text("On this iPhone, **double-click the Side button** (Apple Pay), authenticate with **Face ID**, and **tap your card**.")
+                    Text(TrollStoreAccess.enabled
+                         ? "Keep your iPhone unlocked. TrollStore reads saved Wallet cards directly."
+                         : "On this iPhone, double-click the Side button (Apple Pay), authenticate with Face ID, and tap your card.")
                 }
                 HStack(alignment: .top, spacing: 10) {
                     Text("3.")
